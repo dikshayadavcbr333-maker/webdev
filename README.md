@@ -55,6 +55,8 @@ Use `http://localhost:5000` as the base URL and send JSON bodies with `Content-T
 4. `PUT /api/books/<id>` with a JSON body containing the fields to update, for example `{ "available": false }`.
 5. `DELETE /api/books/<id>` and then repeat GET by ID to confirm it was removed.
 
+For a repeatable first-run walkthrough, import `postman_qa_collection.json` into Postman and run its requests in order. The collection creates the three demo books, runs CRUD and validation checks, deletes its temporary QA record, and checks that only the three demo books remain. It expects an empty `books` collection; if you run it again after the seed data is present, the create requests will return 409 for duplicate ISBNs.
+
 Malformed IDs return 400, missing books return 404, invalid model data returns 400, and duplicate ISBN values return 409.
 
 ## How the code is organized
