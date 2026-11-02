@@ -18,21 +18,27 @@ app.get("/", (req, res) => {
 // Register book routes
 app.use("/api/books", bookRoutes);
 
-// Debug message
-console.log("Book routes registered at /api/books");
-
 // Connect to MongoDB and start server
 const PORT = process.env.PORT || 5000;
 
-mongoose
-    .connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log("MongoDB connected successfully!");
+async function startServer() {
+    if (!process.env.MONGO_URI) {
+        throw new Error("MONGO_URI is missing. Copy .env.example to .env and add your MongoDB connection string.");
+    }
 
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
-        });
-    })
-    .catch((error) => {
-        console.error("MongoDB connection failed:", error.message);
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("MongoDB connected successfully!");
+
+    return app.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
     });
+}
+
+if (require.main === module) {
+    startServer().catch((error) => {
+        console.error("Unable to start the server:", error.message);
+        process.exitCode = 1;
+    });
+}
+
+module.exports = { app, startServer };

@@ -1,0 +1,35 @@
+{
+  "info": {
+    "name": "Library Management System API",
+    "description": "CRUD walkthrough for the Node, Express, and MongoDB backend tutorial.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "bookId", "value": "" },
+    { "key": "isbn", "value": "9780547928227" }
+  ],
+  "item": [
+    {
+      "name": "Health check",
+      "request": { "method": "GET", "url": "{{baseUrl}}/" }
+    },
+    {
+      "name": "Create book",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Book created', function () { pm.response.to.have.status(201); });", "const data = pm.response.json();", "if (data.book && data.book._id) pm.collectionVariables.set('bookId', data.book._id);"] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"The Hobbit\",\n  \"author\": \"J.R.R. Tolkien\",\n  \"isbn\": \"{{isbn}}\",\n  \"publishedYear\": 1937,\n  \"available\": true\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{baseUrl}}/api/books"
+      }
+    },
+    { "name": "List books", "request": { "method": "GET", "url": "{{baseUrl}}/api/books" } },
+    { "name": "Get book by ID", "request": { "method": "GET", "url": "{{baseUrl}}/api/books/{{bookId}}" } },
+    {
+      "name": "Update book",
+      "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"available\": false\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/books/{{bookId}}" }
+    },
+    { "name": "Delete book", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/books/{{bookId}}" } }
+  ]
+}

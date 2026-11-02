@@ -1,6 +1,14 @@
 
 const Book = require("../models/Book");
 
+function sendError(res, error) {
+    if (error.code === 11000) {
+        return res.status(409).json({ message: "A book with this ISBN already exists" });
+    }
+    const status = ["ValidationError", "CastError"].includes(error.name) ? 400 : 500;
+    return res.status(status).json({ message: error.message });
+}
+
 // Add a new book
 exports.addBook = async (req, res) => {
     try {
@@ -10,9 +18,7 @@ exports.addBook = async (req, res) => {
             book
         });
     } catch (error) {
-        res.status(400).json({
-            message: error.message
-        });
+        sendError(res, error);
     }
 };
 
@@ -22,9 +28,7 @@ exports.getBooks = async (req, res) => {
         const books = await Book.find();
         res.status(200).json(books);
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        sendError(res, error);
     }
 };
 
@@ -41,9 +45,10 @@ exports.getBookById = async (req, res) => {
 
         res.status(200).json(book);
     } catch (error) {
-        res.status(400).json({
-            message: "Invalid book ID"
-        });
+        if (error.name === "CastError") {
+            return res.status(400).json({ message: "Invalid book ID" });
+        }
+        sendError(res, error);
     }
 };
 
@@ -70,9 +75,7 @@ exports.updateBook = async (req, res) => {
             book
         });
     } catch (error) {
-        res.status(400).json({
-            message: error.message
-        });
+        sendError(res, error);
     }
 };
 
@@ -91,8 +94,9 @@ exports.deleteBook = async (req, res) => {
             message: "Book deleted successfully"
         });
     } catch (error) {
-        res.status(400).json({
-            message: "Invalid book ID"
-        });
+        if (error.name === "CastError") {
+            return res.status(400).json({ message: "Invalid book ID" });
+        }
+        sendError(res, error);
     }
 };
